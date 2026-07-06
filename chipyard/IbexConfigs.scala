@@ -9,5 +9,6 @@ import org.chipsalliance.cde.config.Config
 class IbexConfig extends Config(
   new ibex.WithNIbexCores(1) ++
   new chipyard.config.WithInclusiveCacheWriteBytes(4) ++
+  new chipyard.config.WithIbexBootROM() ++
   new chipyard.config.AbstractConfig)
 
