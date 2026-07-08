@@ -9,7 +9,7 @@ default: $(PREPROC_VERILOG)
 
 IBEX_PKGS = \
 	$(ibex_dir)/rtl/ibex_pkg.sv \
-	$(ibex_dir)/vendor/lowrisc_ip/ip/prim/rtl/prim_assert.sv \
+	$(ibex_dir)/vendor/lowrisc_ip/ip/prim/rtl/prim_assert_dummy_macros.svh \
 	$(ibex_dir)/vendor/lowrisc_ip/ip/prim/rtl/prim_ram_1p_pkg.sv \
 	$(ibex_dir)/dv/uvm/core_ibex/common/prim/prim_pkg.sv
 
@@ -64,7 +64,7 @@ INC_DIRS ?= $(foreach dir_name,$(INC_DIR_NAMES),$(call lookup_dirs,$(dir_name)))
 # these flags are specific to Chipyard
 EXTRA_PREPROC_DEFINES ?=
 PREPROC_DEFINES ?= \
-	VERILATOR \
+	SYNTHESIS \
 	$(EXTRA_PREPROC_DEFINES)
 
 PREPROC_SCRIPT = $(base_dir)/scripts/insert-includes.py

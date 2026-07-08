@@ -40,7 +40,7 @@ case class IbexCoreParams(
   val rv32e: Int = 0,
   val rv32m: String = "RV32MFast",
   val rv32b: String = "RV32BNone",
-  val regFile: String = "RegFileFF",
+  val regFile: String = "RegFileLatch",
   val branchTargetALU: Int = 0,
   val wbStage: Int = 0,
   val branchPredictor: Int = 0,
