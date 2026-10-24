@@ -12,3 +12,9 @@ class IbexConfig extends Config(
   new chipyard.config.WithIbexBootROM() ++
   new chipyard.config.AbstractConfig)
 
+class IbexLockstepConfig extends Config(
+  new ibexLockstep.WithNIbexCoresLockstep(1) ++
+  new chipyard.config.WithInclusiveCacheWriteBytes(4) ++
+  new chipyard.config.WithIbexBootROM() ++
+  new chipyard.config.AbstractConfig)
+

@@ -3,9 +3,10 @@ vsrc_dir=$(abspath .)
 ibex_dir=$(vsrc_dir)/ibex
 
 PREPROC_VERILOG = IbexCoreBlackbox.preprocessed.sv
+PREPROC_VERILOG_LOCKSTEP = IbexCoreLockstepBlackbox.preprocessed.sv
 
-.PHONY: default $(PREPROC_VERILOG)
-default: $(PREPROC_VERILOG)
+.PHONY: default $(PREPROC_VERILOG) $(PREPROC_VERILOG_LOCKSTEP)
+default: $(PREPROC_VERILOG) $(PREPROC_VERILOG_LOCKSTEP)
 
 IBEX_PKGS = \
 	$(ibex_dir)/rtl/ibex_pkg.sv \
@@ -55,7 +56,11 @@ IBEX_VSRCS = \
 IBEX_WRAPPER = \
 	$(vsrc_dir)/IbexCoreBlackbox.sv
 
+IBEX_LOCKSTEP_WRAPPER = \
+	$(vsrc_dir)/IbexCoreLockstepBlackbox.sv
+
 ALL_VSRCS = $(IBEX_PKGS) $(IBEX_VSRCS) $(IBEX_WRAPPER)
+ALL_VSRCS_LOCKSTEP = $(IBEX_PKGS) $(IBEX_VSRCS) $(IBEX_LOCKSTEP_WRAPPER)
 
 lookup_dirs = $(shell find -L $(ibex_dir) -name target -prune -o -type d -print 2> /dev/null | grep '.*/\($(1)\)$$')
 INC_DIR_NAMES ?= vendor/lowrisc_ip/ip/prim/rtl formal/data_ind_timing vendor/lowrisc_ip/dv/sv/dv_utils
@@ -78,5 +83,14 @@ $(PREPROC_VERILOG): $(ALL_VSRCS)
 	sed -i '/.*prim_xilinx_clock_gating/,/;/c\    // Remove when upgrading verilator version' $@ # Remove FPGA module so Ibex works in Verilator v4.304
 	rm -rf combined.sv def.v undef.v
 
+$(PREPROC_VERILOG_LOCKSTEP): $(ALL_VSRCS_LOCKSTEP)
+	mkdir -p $(dir $(PREPROC_VERILOG))
+	$(foreach def,$(PREPROC_DEFINES),echo "\`define $(def)" >> def_ls.v; )
+	$(foreach def,$(PREPROC_DEFINES),echo "\`undef $(def)" >> undef_ls.v; )
+	cat def_ls.v $(ALL_VSRCS_LOCKSTEP) undef_ls.v > combined_ls.sv
+	$(PREPROC_SCRIPT) combined_ls.sv $@ $(INC_DIRS)
+	sed -i '/.*prim_xilinx_clock_gating/,/;/c\    // Remove when upgrading verilator version' $@ # Remove FPGA module so Ibex works in Verilator v4.304
+	rm -rf combined_ls.sv def_ls.v undef_ls.v
+
 clean:
-	rm -rf $(PREPROC_VERILOG)
+	rm -rf $(PREPROC_VERILOG) $(PREPROC_VERILOG_LOCKSTEP)
